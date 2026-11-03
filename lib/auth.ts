@@ -40,6 +40,27 @@ export const auth = betterAuth({
     minPasswordLength: 12,
   },
 
+  advanced: {
+    ipAddress: {
+      /**
+       * Behind Railway's proxy the socket address is the proxy, not the
+       * client, so rate limiting would otherwise share one bucket across
+       * every visitor and let a single caller lock everyone out.
+       *
+       * Ordered most to least specific. The first two carry a single
+       * address, which Better Auth trusts as-is; `x-forwarded-for` is a
+       * comma-separated chain and is only a fallback. No `trustedProxies`
+       * is set because the origin is reachable only through Railway's proxy,
+       * so clients cannot set these headers themselves.
+       */
+      ipAddressHeaders: [
+        "x-envoy-external-address",
+        "x-real-ip",
+        "x-forwarded-for",
+      ],
+    },
+  },
+
   session: {
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24,

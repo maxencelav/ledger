@@ -1,0 +1,30 @@
+# Local Postgres for development.
+#
+# Production runs on Railway; pointing local development at that same database
+# means test accounts and migrations land in production. This keeps the two
+# apart. The image tracks the Railway server version so behaviour matches.
+services:
+  postgres:
+    image: postgres:18.6
+    container_name: ledger-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ledger
+      POSTGRES_PASSWORD: ledger
+      POSTGRES_DB: ledger
+    ports:
+      - "5432:5432"
+    volumes:
+      # Postgres 18+ images expect the mount one level up, at /var/lib/postgresql,
+      # so the server can keep its data in a version-named subdirectory.
+      - ledger-pgdata:/var/lib/postgresql
+    healthcheck:
+      # Lets `docker compose up --wait` block until the server really accepts
+      # connections, rather than just until the container starts.
+      test: ["CMD-SHELL", "pg_isready -U ledger -d ledger"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  ledger-pgdata:

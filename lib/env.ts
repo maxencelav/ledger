@@ -37,7 +37,11 @@ export const BETTER_AUTH_URL =
  */
 export const MCP_RESOURCE = `${BETTER_AUTH_URL}/api/mcp`;
 
-/** Relying Party ID for WebAuthn: the bare domain, without scheme or port. */
+/**
+ * Relying Party ID for WebAuthn: the bare domain, without scheme or port.
+ * Passkeys are bound to it, so one registered against localhost will not work
+ * on a deployed domain, and vice versa.
+ */
 export const RP_ID = new URL(BETTER_AUTH_URL).hostname;
 
 export const RP_NAME = "Ledger";
